@@ -897,7 +897,7 @@
 
         widget.addSpacer(3);
 
-        const lineDestLabel = widget.addText(\`${LINE} → ${DESTINATION}\`);
+        const lineDestLabel = widget.addText(\`\${LINE} → \${DESTINATION}\`);
         lineDestLabel.font = Font.systemFont(13);
         lineDestLabel.textColor = new Color("#EDEEF0");
         lineDestLabel.lineLimit = 1;
@@ -917,7 +917,7 @@
 
             if (nextArrivalDate) {
               widget.addSpacer(2);
-              const atLabel = widget.addText(\`at ${formatClock(nextArrivalDate)}\`);
+              const atLabel = widget.addText(\`at \${formatClock(nextArrivalDate)}\`);
               atLabel.font = Font.systemFont(11);
               atLabel.textColor = new Color("#7B8494");
               atLabel.centerAlignText();
