@@ -815,12 +815,11 @@
       const next = arrivals[0] || null;
       const upcoming = arrivals.slice(1, 3);
 
-      // Parse a "5:47 PM"-style clock string into a real Date for *today*,
-      // so it can be handed to addDate() for the OS's own live-updating
-      // relative-time text. If the parsed time looks like it's more than a
-      // few hours in the past, assume it actually means the next occurrence
-      // after a midnight rollover (e.g. a "12:03 AM" arrival read late in
-      // the evening) and roll it forward a day.
+      // Parse a "5:47 PM"-style clock string into a real Date for *today*.
+      // If the parsed time looks like it's more than a few hours in the
+      // past, assume it actually means the next occurrence after a midnight
+      // rollover (e.g. a "12:03 AM" arrival read late in the evening) and
+      // roll it forward a day.
       function parseClockTimeToday(clockStr) {
         if (!clockStr) return null;
         const match = clockStr.trim().match(/^(\\d{1,2}):(\\d{2})\\s*([AP]M)$/i);
@@ -883,9 +882,9 @@
       const isSmall = family === "small";
 
       if (isSmall) {
-        // Small widgets are a single vertical column. Keep the station,
-        // line/destination, and next arrival as separate rows rather than
-        // placing the time beside the header.
+        // Small widgets are a single vertical column: station, line and
+        // destination, headline arrival, then the freshness line and the
+        // next couple of trains.
         widget.addSpacer();
 
         const stationLabel = widget.addText(STATION.toUpperCase());
@@ -906,35 +905,69 @@
 
         widget.addSpacer(8);
 
-        if (!fetchError && next) {
-          if (isArrivingNow) {
-            const arrivingLabel = widget.addText("Arriving");
-            arrivingLabel.font = Font.boldSystemFont(24);
-            arrivingLabel.textColor = new Color("#E8A33D");
-            arrivingLabel.centerAlignText();
-            arrivingLabel.lineLimit = 1;
-            arrivingLabel.minimumScaleFactor = 0.6;
+        if (fetchError) {
+          const errLabel = widget.addText("Can't load data");
+          errLabel.font = Font.mediumSystemFont(14);
+          errLabel.textColor = new Color("#D6534A");
+          errLabel.centerAlignText();
+          errLabel.lineLimit = 1;
+          errLabel.minimumScaleFactor = 0.6;
+        } else if (!next) {
+          const emptyLabel = widget.addText("No trains soon");
+          emptyLabel.font = Font.systemFont(14);
+          emptyLabel.textColor = new Color("#7B8494");
+          emptyLabel.centerAlignText();
+          emptyLabel.lineLimit = 1;
+        } else if (isArrivingNow) {
+          const arrivingLabel = widget.addText("Arriving");
+          arrivingLabel.font = Font.boldSystemFont(24);
+          arrivingLabel.textColor = new Color("#E8A33D");
+          arrivingLabel.centerAlignText();
+          arrivingLabel.lineLimit = 1;
+          arrivingLabel.minimumScaleFactor = 0.6;
 
-            if (nextArrivalDate) {
-              widget.addSpacer(2);
-              const atLabel = widget.addText(\`at \${formatClock(nextArrivalDate)}\`);
-              atLabel.font = Font.systemFont(11);
-              atLabel.textColor = new Color("#7B8494");
-              atLabel.centerAlignText();
-              atLabel.lineLimit = 1;
-            }
-          } else {
-            const label = nextArrivalDate ? formatClock(nextArrivalDate) : (next.waitingTime || "—");
-            const clockLabel = widget.addText(label);
-            clockLabel.font = Font.boldSystemFont(26);
-            clockLabel.textColor = new Color("#E8A33D");
-            clockLabel.centerAlignText();
-            clockLabel.lineLimit = 1;
-            clockLabel.minimumScaleFactor = 0.5;
+          if (nextArrivalDate) {
+            widget.addSpacer(2);
+            const atLabel = widget.addText(\`at \${formatClock(nextArrivalDate)}\`);
+            atLabel.font = Font.systemFont(11);
+            atLabel.textColor = new Color("#7B8494");
+            atLabel.centerAlignText();
+            atLabel.lineLimit = 1;
+          }
+        } else {
+          const label = nextArrivalDate ? formatClock(nextArrivalDate) : (next.waitingTime || "—");
+          const clockLabel = widget.addText(label);
+          clockLabel.font = Font.boldSystemFont(26);
+          clockLabel.textColor = new Color("#E8A33D");
+          clockLabel.centerAlignText();
+          clockLabel.lineLimit = 1;
+          clockLabel.minimumScaleFactor = 0.5;
+        }
+
+        // Footer: only when the fetch succeeded (on an error nothing was
+        // actually refreshed, so a timestamp would be misleading).
+        if (!fetchError) {
+          widget.addSpacer(8);
+
+          const refreshedLabel = widget.addText(\`Last refreshed \${formatClock(new Date(lastRefreshedAt || Date.now()))}\`);
+          refreshedLabel.font = Font.mediumSystemFont(10);
+          refreshedLabel.textColor = new Color("#ACACAD");
+          refreshedLabel.centerAlignText();
+          refreshedLabel.lineLimit = 1;
+          refreshedLabel.minimumScaleFactor = 0.6;
+
+          if (upcoming.length) {
+            widget.addSpacer(4);
+            const nextTrainsLabel = widget.addText(\`Next trains: \${upcoming.map(upcomingClockLabel).join(", ")}\`);
+            nextTrainsLabel.font = Font.systemFont(10);
+            nextTrainsLabel.textColor = new Color("#7B8494");
+            nextTrainsLabel.centerAlignText();
+            nextTrainsLabel.lineLimit = 1;
+            nextTrainsLabel.minimumScaleFactor = 0.6;
           }
         }
 
-        widget.addSpacer(10);
+        widget.addSpacer();
 
       } else {
         // Medium/large (and in-app preview): follows the same design
