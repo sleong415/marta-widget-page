@@ -57,7 +57,7 @@
       /* ---------- Hero: the board ---------- */
 
       .hero {
-        padding: 64px 0 0px;
+        padding: 64px 0 32px;
       }
 
       .hero-label {
@@ -75,13 +75,7 @@
       }
 
       /* Widget mockup — styled to match the actual generated small
-         Scriptable widget as closely as CSS allows: same dark
-         rounded square, same two-column header (station + line/dest
-         on the left, the arrival clock time right-aligned in amber
-         on the right), same "Last refreshed" / "Next trains" footer
-         lines below. Sized up from the real widget's ~158pt for
-         hero visibility, with a phone-homescreen-style backdrop
-         behind it for context. */
+         Scriptable widget as closely as CSS allows. */
       .widget-stage {
         background: linear-gradient(160deg, #2a2f3d, #0f1116 70%);
         border-radius: 32px;
@@ -199,7 +193,7 @@
       /* ---------- Sections ---------- */
 
       section {
-        padding: 40px 0;
+        padding: 32px 0;
         border-top: 1px solid var(--panel-border);
       }
 
@@ -213,6 +207,75 @@
         color: var(--muted);
         font-size: 15px;
         margin: 0 0 24px;
+      }
+
+      /* ---------- About ---------- */
+
+      .about p {
+        color: var(--muted);
+        font-size: 15px;
+        margin: 0 0 14px;
+      }
+
+      /* ---------- FAQ ---------- */
+
+      .about a,
+      .faq a {
+        color: var(--amber);
+      }
+
+      .faq details {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+
+      .faq details[open] {
+        border-color: var(--amber-dim);
+      }
+
+      .faq summary {
+        position: relative;
+        cursor: pointer;
+        list-style: none;
+        padding: 14px 44px 14px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 6px;
+      }
+
+      .faq summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .faq summary::after {
+        content: "";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        width: 12px;
+        height: 8px;
+        margin-top: -4px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%237B8494' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+          no-repeat center;
+        transition: transform 0.15s ease;
+      }
+
+      .faq details[open] summary::after {
+        transform: rotate(180deg);
+      }
+
+      .faq summary:focus-visible {
+        outline: 2px solid var(--amber);
+        outline-offset: 2px;
+      }
+
+      .faq details p {
+        margin: 0;
+        padding: 0 16px 16px;
+        color: var(--muted);
+        font-size: 14px;
       }
 
       /* ---------- Station picker ---------- */
@@ -425,17 +488,11 @@
         </div>
       </div>
 
-      <p class="section-sub">
-        Widgets created will show a station's train arrival times for one line
-        and direction. The data is provided through MARTA's public real-time
-        data service.
-      </p>
-
       <section id="setup">
         <h2>Pick your station</h2>
         <p class="section-sub">
-          This generates a small script personalized to your stop. It runs
-          entirely through Scriptable — nothing to install from us.
+          This generates a short script for your stop. It runs inside the free
+          Scriptable app, so there's nothing else to install.
         </p>
 
         <select id="station-select">
@@ -571,6 +628,101 @@
             </div>
           </li>
         </ol>
+      </section>
+
+      <section id="faq" class="faq">
+        <h2>FAQ</h2>
+        <details>
+          <summary>Why do I need Scriptable instead of a regular app?</summary>
+          <p>
+            Building a native iPhone widget requires a Mac and Apple's developer
+            tools, and distributing an app means an Apple Developer account and
+            App Store review. I built this as a side project without those, so I
+            used Scriptable, a free app that lets small scripts run as home
+            screen widgets. The tradeoff is a few extra setup steps for you. The
+            upside is that the whole thing is a short script you can read before
+            you run it.
+          </p>
+        </details>
+        <details>
+          <summary>Does it work on Android?</summary>
+          <p>
+            No. Scriptable is only available for iPhone and iPad, and the script
+            it runs is written for it, so this widget is iOS only.
+          </p>
+        </details>
+        <details>
+          <summary>Does it cover buses or just trains?</summary>
+          <p>
+            Just MARTA rail: the Red, Gold, Blue, and Green lines. Buses and the
+            streetcar are not included.
+          </p>
+        </details>
+        <details>
+          <summary>Can I have more than one station?</summary>
+          <p>
+            Yes. Each widget shows one station, line, and direction, so generate
+            a script for each one you want. Save each as its own script in
+            Scriptable, then add another Scriptable widget to your home screen
+            and point it at that script.
+          </p>
+        </details>
+        <details>
+          <summary>Why does it say &ldquo;No trains soon&rdquo;?</summary>
+          <p>
+            The widget reached MARTA's data fine, but there are no upcoming
+            arrivals listed for that station, line, and direction right now.
+            That's common late at night or when service has ended for the day.
+            It's different from &ldquo;Can't load data&rdquo;, which means the
+            widget couldn't reach the service at all. In that case, tap the
+            widget to try again.
+          </p>
+        </details>
+        <details>
+          <summary>
+            Why is the time different from the signs in the station?
+          </summary>
+          <p>
+            The widget uses MARTA's public real-time data, which can run a few
+            minutes behind what the station signs show. The widget also only
+            updates when it refreshes, so the time on your home screen is as of
+            the &ldquo;Last refreshed&rdquo; time shown on it. If it looks old,
+            tap the widget to update it. When in doubt, trust the station signs.
+            See <a href="#how-it-works">How the widget works</a> for more.
+          </p>
+        </details>
+        <details>
+          <summary>What data do you collect?</summary>
+          <p>
+            No accounts, no names, no email addresses, and no location. Each
+            widget sends a random ID that's generated on your phone and isn't
+            tied to you. When a widget requests arrivals, my server logs that
+            ID, the station, line, and direction requested, the time, and
+            whether the request worked. If someone sends too many requests too
+            quickly, the server also logs their IP address and the request path.
+            I use this to see how the service is running and to fix problems.
+          </p>
+        </details>
+      </section>
+
+      <section id="about" class="about">
+        <h2>About</h2>
+        <p>
+          I got tired of opening the MARTA app and clicking around just to see
+          when the next train was coming. So I made this widget for myself: one
+          glance at my home screen and I know when to leave.
+        </p>
+        <p>
+          After using it for a while, I figured other riders might feel the same
+          way, so I put it online for anyone who wants it. It runs through the
+          free Scriptable app instead of a native app, and the
+          <a href="#faq">FAQ</a> explains why.
+        </p>
+        <p>
+          Arrival data comes from MARTA's public real-time data service. There
+          are no accounts and no sign-up, and the project is an independent side
+          project run by one person.
+        </p>
       </section>
 
       <footer>
@@ -1109,9 +1261,7 @@
           });
           destinationSelect.disabled = false;
 
-          // Same idea for direction: some stations (e.g. terminal
-          // stations like Airport or North Springs) only go one way
-          // on a given line, so there's nothing to actually choose.
+          // Same idea for direction: some station
           if (destinations.length === 1) {
             destinationSelect.value = destinations[0];
           }
@@ -1133,13 +1283,9 @@
             copyBtn.dataset.copied = "false";
           }, 2000);
         } catch (e) {
-          // navigator.clipboard requires a secure context (HTTPS, or
-          // literally the hostname "localhost") — it's blocked when
-          // testing over a plain http:// LAN IP. This won't happen once
-          // deployed. Meanwhile, reveal and auto-select the script text
-          // so the user only has to tap "Copy" from the OS's own
-          // selection menu instead of manually finding and dragging to
-          // select it themselves.
+          // navigator.clipboard requires a secure context (HTTPS, or literally
+          // the hostname "localhost"). Meanwhile, reveal and auto-select the
+          // script text so the user only has to tap "Copy"
           preview.style.display = "block";
           scriptVisible = true;
           toggleBtn.textContent = "Hide script";
@@ -1163,10 +1309,7 @@
       // ---------- Live hero board (Five Points, Gold line, Airport) ----------
 
       // Same clock-deriving logic as the generated Scriptable script,
-      // duplicated here so this hero mock behaves identically: prefer
-      // the backend's own formatted arrival clock string, falling
-      // back to deriving one from "X min" waiting-time text when
-      // that's all that's available.
+      // duplicated here so this hero mock behaves identically
       function parseClockTimeToday(clockStr) {
         if (!clockStr) return null;
         const match = clockStr.trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
@@ -1267,10 +1410,6 @@
 
           footer.textContent = "Live — connected to MARTA";
         } catch (e) {
-          // Backend not reachable yet (e.g. still pointed at the
-          // placeholder URL, or not deployed). Leave the static example
-          // values in place and just relabel the footer so it doesn't
-          // look like a bug.
           footer.textContent =
             "LIVE PREVIEW UNAVAILABLE — SHOWING EXAMPLE LAYOUT";
         } finally {
